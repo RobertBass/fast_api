@@ -1,15 +1,14 @@
-import os
-from pathlib import Path
 from typing import Annotated
-import environ
-from fastapi import Depends
-from sqlmodel import Session, create_engine
+from fastapi import Depends, FastAPI
+from sqlmodel import SQLModel, Session, create_engine
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-engine = create_engine(env.get("DATABASE_URL"))
+db_url = "postgresql://robertbass:bene#37151#@localhost:5432/fastapidb"
+engine = create_engine(db_url)
+
+def create_all_tables(app: FastAPI):
+    SQLModel.metadata.create_all(engine)
+    yield
 
 def get_session():
     with Session(engine) as session:

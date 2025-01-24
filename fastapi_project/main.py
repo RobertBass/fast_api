@@ -1,14 +1,14 @@
 import zoneinfo
 from datetime import datetime
 from fastapi import FastAPI
-from fastapi_project import db
+from db import SessionDep, create_all_tables
 from models.customer import CustomerInfo, CreateCustomer
 from models.transaction import Transaction
 from models.invoice import Invoice
+from sqlmodel import select
 
 
-app = FastAPI()
-
+app = FastAPI(lifespan=create_all_tables)
 
 @app.get("/")
 async def root():
@@ -39,17 +39,21 @@ async def date(iso_code: str):
         }
 
 
-db_customers: list[CustomerInfo] = []
+#db_customers: list[CustomerInfo] = []
 
-@app.get("/customers", response_model=list[CustomerInfo])
-async def get_customers():
-    return db_customers
+@app.get("/customers", response_model=CustomerInfo)
+async def get_customers(session=SessionDep):
+    return session.execute(select(CustomerInfo)).all()
 
-@app.post("/customers/create", response_model=CustomerInfo, session=db.SessionDep)
-async def create_customer(customer_data: CreateCustomer):
+
+@app.post("/customers/create", response_model=CustomerInfo)
+async def create_customer(customer_data: CreateCustomer, session=SessionDep):
     customer = CustomerInfo.model_validate(customer_data.model_dump())
-    db_customers.append(customer)
-    customer.id = len(db_customers)
+    session.add(customer)
+    session.commit()
+    session.refresh(customer)
+    #db_customers.append(customer)
+    #customer.id = len(db_customers)
     return customer
 
 @app.post("/transactions")
