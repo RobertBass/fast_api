@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from sqlmodel import SQLModel, Field
 
-class CustomerInfo(SQLModel, table=True):
+class Customer(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(default=None)
     description: str | None = Field(default=None)

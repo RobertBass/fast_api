@@ -2,7 +2,7 @@ import zoneinfo
 from datetime import datetime
 from fastapi import FastAPI
 from db import SessionDep, create_all_tables
-from models.customer import CustomerInfo, CreateCustomer
+from models.customer import Customer, CreateCustomer
 from models.transaction import Transaction
 from models.invoice import Invoice
 from sqlmodel import select
@@ -41,14 +41,14 @@ async def date(iso_code: str):
 
 #db_customers: list[CustomerInfo] = []
 
-@app.get("/customers", response_model=CustomerInfo)
+@app.get("/customers", response_model=Customer)
 async def get_customers(session=SessionDep):
-    return session.execute(select(CustomerInfo)).all()
+    return session.execute(select(Customer)).all()
 
 
-@app.post("/customers/create", response_model=CustomerInfo)
+@app.post("/customers/create", response_model=Customer)
 async def create_customer(customer_data: CreateCustomer, session=SessionDep):
-    customer = CustomerInfo.model_validate(customer_data.model_dump())
+    customer = Customer.model_validate(customer_data.model_dump())
     session.add(customer)
     session.commit()
     session.refresh(customer)
