@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-from models.customer import CustomerInfo
+from models.customer import Customer
 from models.transaction import Transaction
 
 class Invoice(BaseModel):
     id: int
-    customer: CustomerInfo
+    customer: Customer
     transactions: list[Transaction]
     total: int
 
