@@ -1,9 +1,11 @@
+import os
 from typing import Annotated
 from fastapi import Depends, FastAPI
 from sqlmodel import SQLModel, Session, create_engine
+from dotenv import load_dotenv
+load_dotenv()
 
-
-db_url = "postgresql://robertbass:bene#37151#@localhost:5432/fastapidb"
+db_url = os.getenv('DATABASE_URL')
 engine = create_engine(db_url)
 
 def create_all_tables(app: FastAPI):
