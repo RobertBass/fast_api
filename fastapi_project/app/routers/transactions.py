@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, Query, status, HTTPException
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlmodel import select
 from models.customer import Customer
 from models.transaction import Transaction, CreateTransaction
@@ -21,5 +23,6 @@ async def create_transaction(transaction_data: CreateTransaction, session: Sessi
 
 
 @router.get("/transactions", status_code=status.HTTP_200_OK)
-async def get_transactions(session: SessionDep):
-    return session.exec(select(Transaction)).all()
+async def get_transactions(session: SessionDep) -> Page[Transaction]:
+    return paginate(session, select(Transaction))
+
